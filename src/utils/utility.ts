@@ -1,6 +1,8 @@
 import Joi from "joi";
 import bcrypt from "bcrypt"
-
+import { AutoPayload } from "../interface";
+import jwt from "jsonwebtoken"
+import { AppSecret } from "../config/indexDB";
 export const registerSchema = Joi.object().keys({
   email: Joi.string().required(),
   phone: Joi.string().required(),
@@ -30,4 +32,8 @@ export const GenerateSalt = async() => {
 
 export const GeneratePassword = async(password:string,salt:string) => {
     return await bcrypt.hash(password,salt)
+   }
+
+   export const GenerateSignature = async(payload:AutoPayload) => {
+    return jwt.sign(payload,AppSecret, {expiresIn:"1d"})  //FOR 1 WEEK 7d, FOR 1 MONTH 1m
    }

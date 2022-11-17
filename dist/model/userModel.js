@@ -18,16 +18,24 @@ UserInstance.init({
         unique: true,
         validate: {
             notNull: {
-                msg: "Email Address is required",
+                msg: "Email address is required",
             },
             isEmail: {
-                msg: "Please provide a valid email",
+                msg: "please provide a valid email",
             },
         },
     },
     password: {
         type: sequelize_1.DataTypes.STRING,
-        allowNull: true,
+        allowNull: false,
+        validate: {
+            notNull: {
+                msg: "password is required",
+            },
+            notEmpty: {
+                msg: "provide a password",
+            },
+        },
     },
     firstName: {
         type: sequelize_1.DataTypes.STRING,
@@ -40,15 +48,10 @@ UserInstance.init({
     salt: {
         type: sequelize_1.DataTypes.STRING,
         allowNull: false,
-        validate: {
-            notNull: {
-                msg: "Salt is required",
-            },
-        },
     },
     address: {
         type: sequelize_1.DataTypes.STRING,
-        allowNull: false,
+        allowNull: true
     },
     phone: {
         type: sequelize_1.DataTypes.STRING,
@@ -58,52 +61,52 @@ UserInstance.init({
                 msg: "Phone number is required",
             },
             notEmpty: {
-                msg: "Please provide a phone number",
+                msg: "provide a phone number",
             },
-        },
+        }
     },
     otp: {
-        type: sequelize_1.DataTypes.INTEGER,
+        type: sequelize_1.DataTypes.NUMBER,
         allowNull: false,
         validate: {
             notNull: {
                 msg: "Otp is required",
             },
             notEmpty: {
-                msg: "Please provide an Otp",
+                msg: "provide an Otp",
             },
-        },
+        }
     },
     otp_expiry: {
         type: sequelize_1.DataTypes.DATE,
         allowNull: false,
         validate: {
             notNull: {
-                msg: "Otp is required",
-            },
-        },
+                msg: "Otp expired",
+            }
+        }
     },
     lng: {
         type: sequelize_1.DataTypes.NUMBER,
-        allowNull: true,
+        allowNull: true
     },
     lat: {
         type: sequelize_1.DataTypes.NUMBER,
-        allowNull: true,
+        allowNull: true
     },
     verified: {
         type: sequelize_1.DataTypes.BOOLEAN,
         allowNull: false,
         validate: {
             notNull: {
-                msg: "User must be verified",
+                msg: "User must must be verified",
             },
             notEmpty: {
-                msg: "Please provide an Otp",
+                msg: "user not verified",
             },
-        },
-    },
+        }
+    }
 }, {
     sequelize: indexDB_1.db,
-    tableName: "user",
+    tableName: 'user'
 });

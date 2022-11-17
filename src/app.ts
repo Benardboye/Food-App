@@ -8,28 +8,28 @@ import indexRouter from "./routes/indexRoute";
 import { db } from "./config/indexDB";
 
 //Sequulize conncetion
-// db.sync().then(() => {
-//     log.info('Db connected succesfully')
-// }).catch(err => {
-//     log.error(err)
-// })
+db.sync().then(() => {
+    log.info('Db connected succesfully')
+}).catch(err => {
+    log.error(err)
+})
 
         // OR
 
-const dbConnect = async () => {
-  try {
-    let data = await db.sync;
-    if (!data) {
-      log.error("Error connecting");
-    } else {
-      log.info("Db connected succesfully");
-    }
-  } catch (err) {
-    log.error;
-  }
-};
+// const dbConnect = async () => {
+//   try {
+//     let data = await db.sync;
+//     if (!data) {
+//       log.error("Error connecting");
+//     } else {
+//       log.info("Db connected succesfully");
+//     }
+//   } catch (err) {
+//     log.error;
+//   }
+// };
 
-dbConnect()
+// dbConnect()
 
 const app = express();
 

@@ -1,1 +1,4 @@
 node_module
+.env
+yarn.lock
+dist
