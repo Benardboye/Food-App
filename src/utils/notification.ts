@@ -20,7 +20,7 @@ export const GenerateOTP = () => {
   return { otp, expiry };
 };
 
-export const onRequestOtp = async (otp: number, toPhoneNumber: number) => {
+export const onRequestOtp = async (otp: number, toPhoneNumber:string) => {
   const client = require("twilio")(accountSid, authToken);
   const response = await client.messages.create({
     body: `Your OTP is ${otp}. DO NOT DISCLOSE. Expiration is 30mins`,
@@ -61,7 +61,7 @@ export const mailsent = async(
         console.log(err)
     }
 }
-  //EMAIL TEMPLATE
+  //FUNCTION FOR HTML TEMPLATE
 export const emailHtml = (otp:number):string => {
     let response = `
     <div style="font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2;font-size:110%;padding:50px 20px;border:10px solid #ddd">
@@ -71,7 +71,7 @@ export const emailHtml = (otp:number):string => {
     </div>
     <p style="font-size:1.1em">Hi,</p>
     <p>Thank you for creating an account with BOYE Store. Use the following OTP to complete your Sign Up procedures. OTP is valid for 30 minutes</p>
-    <h2 style="background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;">324457</h2>
+    <h2 style="background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;">${otp}</h2>
     <p style="font-size:0.9em;">Regards,<br />BOYE store</p>
     <hr style="border:none;border-top:1px solid #eee" />
     <div style="float:right;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300">

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GenerateSignature = exports.GeneratePassword = exports.GenerateSalt = exports.option = exports.registerSchema = void 0;
+exports.validatePassword = exports.loginSchema = exports.verifySignature = exports.GenerateSignature = exports.GeneratePassword = exports.GenerateSalt = exports.option = exports.registerSchema = void 0;
 const joi_1 = __importDefault(require("joi"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
@@ -51,3 +51,28 @@ const GenerateSignature = (payload) => __awaiter(void 0, void 0, void 0, functio
     return jsonwebtoken_1.default.sign(payload, indexDB_1.AppSecret, { expiresIn: "1d" }); //FOR 1 WEEK 7d, FOR 1 MONTH 1m
 });
 exports.GenerateSignature = GenerateSignature;
+const verifySignature = (signature) => __awaiter(void 0, void 0, void 0, function* () {
+    return jsonwebtoken_1.default.verify(signature, indexDB_1.AppSecret);
+});
+exports.verifySignature = verifySignature;
+/**======================================================   Login   =================================================================**/
+exports.loginSchema = joi_1.default.object().keys({
+    email: joi_1.default.string().required(),
+    password: joi_1.default.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")), //Joi.string().(/[a-zA-Z0-9]{6,30}/),
+});
+// To avoid errors with /phone/, /email/ etc
+//Example "\"password\" with value \"123456\" fails to
+//match the required pattern: /^[a-zA-Z0-9],{6,30}$/"
+// export const option = {
+//   abortEarly: false,
+//   errors: {
+//     wrap: {
+//       label: "",
+//     },
+//   },
+// };
+//BCRYPT.COMPARE() CAN BE USED INSTEAD OF THE BELOW
+const validatePassword = (enteredPassword, savedPassword, salt) => __awaiter(void 0, void 0, void 0, function* () {
+    return (yield (0, exports.GeneratePassword)(enteredPassword, salt)) === savedPassword;
+});
+exports.validatePassword = validatePassword;
