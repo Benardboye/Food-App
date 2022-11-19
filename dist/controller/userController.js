@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ResendOtp = exports.Login = exports.VerifyUser = exports.Register = void 0;
+exports.getSingleUser = exports.getAllUser = exports.ResendOtp = exports.Login = exports.VerifyUser = exports.Register = void 0;
 const utils_1 = require("../utils");
 const userModel_1 = require("../model/userModel");
 const uuid_1 = require("uuid");
@@ -147,7 +147,7 @@ const Login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const User = (yield userModel_1.UserInstance.findOne({
             where: { email: email },
         }));
-        if (User) {
+        if (User.verified == true) {
             let validation = yield (0, utils_1.validatePassword)(password, User.password, User.salt);
             // let validation = await bcrypt.compare(password,User.password)
             if (validation) {
@@ -158,7 +158,7 @@ const Login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                     verified: User.verified,
                 });
                 return res.status(200).json({
-                    message: "You hve successfully logged in",
+                    message: "You have successfully logged in",
                     signature,
                     email: User.email,
                     verified: User.verified,
@@ -166,7 +166,7 @@ const Login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             }
         }
         return res.status(400).json({
-            Error: "Wrong Credentials",
+            Error: "Wrong Credentials or not a verified user",
         });
     }
     catch (err) {
@@ -215,12 +215,58 @@ const ResendOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
     catch (err) {
         console.log(err);
-        res
-            .status(500)
-            .json({
+        res.status(500).json({
             Error: "Internal Server Error",
             route: "/user/resend-otp/:signature",
         });
     }
 });
 exports.ResendOtp = ResendOtp;
+/**======================================================   USER PROFILE   =================================================================**/
+const getAllUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const limit = req.query.limit; //LIMIT IS BASICALLY FOR PAGINATION(TO SHOW THE NUMBER OF USERS PER PAGE)
+        // const sort = req.query.sort    //FOR SORTING
+        const users = yield userModel_1.UserInstance.findAndCountAll({
+            limit: limit,
+        }); //FINDALL({}) METHOD CAN BE USED TOO BUT IT DOESN'T HAVE THE COUNT AND ROW FEATURE
+        return res.status(200).json({
+            message: "You have successfully retrived all users",
+            count: users.count,
+            users: users.rows,
+        });
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({
+            Error: "Internal Server Error",
+            route: "/user/get-all-users",
+        });
+    }
+});
+exports.getAllUser = getAllUser;
+/**======================================================   USER PROFILE   =================================================================**/
+const getSingleUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const id = req.user.id;
+        //FIND USER BY ID
+        const User = yield userModel_1.UserInstance.findOne({
+            where: { id: id },
+        });
+        if (User) {
+            return res.status(200).json({
+                User,
+            });
+        }
+        return res.status(400).json({
+            message: "User not found",
+        });
+    }
+    catch (err) {
+        return res.status(500).json({
+            Error: "Internal Server Error",
+            route: "/user/get-user",
+        });
+    }
+});
+exports.getSingleUser = getSingleUser;

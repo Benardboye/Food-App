@@ -176,7 +176,7 @@ export const Login = async (req: Request, res: Response) => {
       where: { email: email },
     })) as unknown as UserAtrributes;
 
-    if (User) {
+    if (User.verified == true) {
       let validation = await validatePassword(
         password,
         User.password,
@@ -191,7 +191,7 @@ export const Login = async (req: Request, res: Response) => {
           verified: User.verified,
         });
         return res.status(200).json({
-          message: "You hve successfully logged in",
+          message: "You have successfully logged in",
           signature,
           email: User.email,
           verified: User.verified,
@@ -199,7 +199,7 @@ export const Login = async (req: Request, res: Response) => {
       }
     }
     return res.status(400).json({
-      Error: "Wrong Credentials",
+      Error: "Wrong Credentials or not a verified user",
     });
   } catch (err) {
     console.log(err);
@@ -239,7 +239,7 @@ export const ResendOtp = async (req: Request, res: Response) => {
         const User = (await UserInstance.findOne({
           where: { email: decode.email },
         })) as unknown as UserAtrributes;
-    
+
         await onRequestOtp(otp, User.phone);
 
         //SEND EMAIL TO USER
@@ -256,11 +256,63 @@ export const ResendOtp = async (req: Request, res: Response) => {
     }
   } catch (err) {
     console.log(err);
-    res
-      .status(500)
-      .json({
-        Error: "Internal Server Error",
-        route: "/user/resend-otp/:signature",
+    res.status(500).json({
+      Error: "Internal Server Error",
+      route: "/user/resend-otp/:signature",
+    });
+  }
+};
+
+/**======================================================   USER PROFILE   =================================================================**/
+
+export const getAllUser = async (req: Request, res: Response) => {
+  try {
+    const limit = req.query.limit as number | undefined; //LIMIT IS BASICALLY FOR PAGINATION(TO SHOW THE NUMBER OF USERS PER PAGE)
+    // const sort = req.query.sort    //FOR SORTING
+    const users = await UserInstance.findAndCountAll({
+      limit: limit,
+    }); //FINDALL({}) METHOD CAN BE USED TOO BUT IT DOESN'T HAVE THE COUNT AND ROW FEATURE
+    return res.status(200).json({
+      message: "You have successfully retrived all users",
+      count: users.count,
+      users: users.rows,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      Error: "Internal Server Error",
+      route: "/user/get-all-users",
+    });
+  }
+};
+
+/**======================================================   USER PROFILE   =================================================================**/
+
+export const getSingleUser = async (
+  req: JwtPayload,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const id = req.user.id;
+
+    //FIND USER BY ID
+    const User = await UserInstance.findOne({
+      where: { id: id },
+    });
+    if (User) {
+      return res.status(200).json({
+        User,
       });
+    }
+      return res.status(400).json({
+        message: "User not found",
+      });
+    
+  } catch (err) {
+    return res.status(500).json({
+      Error: "Internal Server Error",
+      route: "/user/get-user",
+    });
   }
 };
