@@ -15,6 +15,8 @@ export interface UserAtrributes {
   lng: number;
   lat: number;
   verified: boolean;
+  role:string
+  
 }
 
 export class UserInstance extends Model<UserAtrributes> {}
@@ -119,7 +121,11 @@ UserInstance.init(
                 msg: "user not verified",
               },
           }
-    }
+    },
+    role:{
+      type:DataTypes.STRING,
+      allowNull:true
+  }
 },
 {
     sequelize:db,

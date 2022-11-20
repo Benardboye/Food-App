@@ -8,7 +8,7 @@ export const auth = async (req: JwtPayload, res: Response, next: NextFunction) =
 
     if (!authorization) {
       return res.status(401).json({
-        Error: "Kindly login as a user",
+        Error: "Kindly login",
       });
     }
     const token = authorization.slice(7, authorization.length);

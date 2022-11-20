@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getSingleUser = exports.getAllUser = exports.ResendOtp = exports.Login = exports.VerifyUser = exports.Register = void 0;
+exports.updateUserProfile = exports.getSingleUser = exports.getAllUser = exports.ResendOtp = exports.Login = exports.VerifyUser = exports.Register = void 0;
 const utils_1 = require("../utils");
 const userModel_1 = require("../model/userModel");
 const uuid_1 = require("uuid");
@@ -52,6 +52,7 @@ const Register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 lng: 0,
                 lat: 0,
                 verified: false,
+                role: "user"
             });
             //SEND OTP TO USER
             yield (0, utils_1.onRequestOtp)(otp, phone);
@@ -147,7 +148,7 @@ const Login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const User = (yield userModel_1.UserInstance.findOne({
             where: { email: email },
         }));
-        if (User.verified == true) {
+        if (User && User.verified == true) {
             let validation = yield (0, utils_1.validatePassword)(password, User.password, User.salt);
             // let validation = await bcrypt.compare(password,User.password)
             if (validation) {
@@ -162,6 +163,7 @@ const Login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                     signature,
                     email: User.email,
                     verified: User.verified,
+                    role: User.role
                 });
             }
         }
@@ -245,7 +247,7 @@ const getAllUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.getAllUser = getAllUser;
-/**======================================================   USER PROFILE   =================================================================**/
+/**======================================================  SINGLE USER   =================================================================**/
 const getSingleUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const id = req.user.id;
@@ -270,3 +272,47 @@ const getSingleUser = (req, res, next) => __awaiter(void 0, void 0, void 0, func
     }
 });
 exports.getSingleUser = getSingleUser;
+/**======================================================  UPDATE USER PROFILE   =================================================================**/
+const updateUserProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const id = req.user.id;
+        const { firstName, lastName, address, phone } = req.body;
+        //JOI VALIDATION
+        const validateResult = utils_1.updateSchema.validate(req.body, utils_1.option);
+        if (validateResult.error) {
+            return res
+                .status(400)
+                .json({ Error: validateResult.error.details[0].message });
+        }
+        //CHECK IF THE USER IS A REGISTERED USER
+        const User = yield userModel_1.UserInstance.findOne({ where: { id: id } });
+        if (!User) {
+            return res.status(400).json({
+                Error: "You are not authorised to update your profile"
+            });
+        }
+        const updatedUser = yield userModel_1.UserInstance.update({
+            firstName,
+            lastName,
+            address,
+            phone
+        }, { where: { id: id } });
+        if (updatedUser) {
+            const User = yield userModel_1.UserInstance.findOne({ where: { id: id } });
+            return res.status(200).json({
+                message: "You have successfully updated your profile",
+                User
+            });
+        }
+        return res.status(400).json({
+            message: "Error Occured"
+        });
+    }
+    catch (err) {
+        return res.status(500).json({
+            Error: "Internal Server Error",
+            route: "/user/update-profile",
+        });
+    }
+});
+exports.updateUserProfile = updateUserProfile;

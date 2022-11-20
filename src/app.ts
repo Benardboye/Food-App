@@ -5,6 +5,7 @@ import colors from "colors";
 import log from "./utils/logger";
 import userRouter from "./routes/userRoute";
 import indexRouter from "./routes/indexRoute";
+import adminRouter from "./routes/adminRoute";
 import { db } from "./config/indexDB";
 
 //Sequulize conncetion
@@ -39,6 +40,7 @@ app.use(logger("dev"));
 app.use(cookieParser());
 
 //ROUTER
+app.use("/api/admins", adminRouter);
 app.use("/api/user", userRouter);
 app.use("/", indexRouter);
 

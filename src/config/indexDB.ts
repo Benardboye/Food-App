@@ -19,3 +19,4 @@ export const GmailPass = process.env.GmailPass
 export const FromAdminMail = process.env.FromAdminMail as string
 export const userSubject = process.env.userSubject as string
 export const AppSecret = process.env.AppSecret!      // '!' WORKS JUST LIKE USING AS STRING
+export const Authorizer1 = process.env.Authorizer1

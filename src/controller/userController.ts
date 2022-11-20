@@ -13,6 +13,7 @@ import {
   verifySignature,
   loginSchema,
   validatePassword,
+  updateSchema,
 } from "../utils";
 import { UserAtrributes, UserInstance } from "../model/userModel";
 import { v4 as uuidv4 } from "uuid";
@@ -63,6 +64,7 @@ export const Register = async (req: Request, res: Response) => {
         lng: 0,
         lat: 0,
         verified: false,
+        role:"user"
       });
 
       //SEND OTP TO USER
@@ -176,7 +178,7 @@ export const Login = async (req: Request, res: Response) => {
       where: { email: email },
     })) as unknown as UserAtrributes;
 
-    if (User.verified == true) {
+    if (User && User.verified == true) {
       let validation = await validatePassword(
         password,
         User.password,
@@ -195,6 +197,7 @@ export const Login = async (req: Request, res: Response) => {
           signature,
           email: User.email,
           verified: User.verified,
+          role:User.role
         });
       }
     }
@@ -286,7 +289,7 @@ export const getAllUser = async (req: Request, res: Response) => {
   }
 };
 
-/**======================================================   USER PROFILE   =================================================================**/
+/**======================================================  SINGLE USER   =================================================================**/
 
 export const getSingleUser = async (
   req: JwtPayload,
@@ -316,3 +319,49 @@ export const getSingleUser = async (
     });
   }
 };
+
+/**======================================================  UPDATE USER PROFILE   =================================================================**/
+
+export const updateUserProfile = async(req:JwtPayload, res: Response) => {
+try{
+  const id = req.user.id;
+  const {firstName,lastName,address,phone } = req.body
+
+  //JOI VALIDATION
+  const validateResult = updateSchema.validate(req.body, option) 
+  if (validateResult.error) {
+    return res
+      .status(400)
+      .json({ Error: validateResult.error.details[0].message });
+  }
+
+  //CHECK IF THE USER IS A REGISTERED USER
+  const User = await UserInstance.findOne({where:{id:id}}) as unknown as UserAtrributes
+  if(!User) {
+    return res.status(400).json({
+      Error:"You are not authorised to update your profile"
+    })
+  }
+  const updatedUser = await UserInstance.update({
+    firstName,
+    lastName,
+    address,
+    phone
+  }, {where:{id:id}}) as unknown as UserAtrributes
+  if(updatedUser) {
+    const User = await UserInstance.findOne({where:{id:id}}) as unknown as UserAtrributes
+return res.status(200).json({
+  message:"You have successfully updated your profile",
+  User
+})
+  }
+  return res.status(400).json({
+    message:"Error Occured"
+  })
+} catch (err) {
+  return res.status(500).json({
+    Error: "Internal Server Error",
+    route: "/user/update-profile",
+  });
+}
+}
