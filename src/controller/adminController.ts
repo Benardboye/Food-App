@@ -7,10 +7,12 @@ import {
   GenerateSalt,
   GenerateSignature,
   option,
+  vendorSchema,
 } from "../utils";
 import { UserAtrributes, UserInstance } from "../model/userModel";
 import { v4 as uuidv4 } from "uuid";
 import { Authorizer1 } from "../config/indexDB";
+import { VendorAtrributes, VendorInstance } from "../model/vendorModel";
 
 export const AdminRegister = async (req: Request, res: Response) => {
   try {
@@ -166,3 +168,86 @@ export const SuperAdminRegister = async (req: JwtPayload, res: Response) => {
       .json({ Error: "Internal Server Error", route: "/create-superadmin" });
   }
 };
+
+
+/**======================================================  CREATE VENDOR   =================================================================**/
+
+export const CreateVendor = async(req:JwtPayload, res:Response) => {
+    try{
+        const {
+            name,
+            ownerName, 
+            pinCode,
+            phone,
+            address,
+            email,
+            password,
+           } = req.body
+
+           const id = req.user.id;
+           const uuidvendor = uuidv4();
+
+ //JOI VALIDATION
+  const validateResult = vendorSchema.validate(req.body, option) 
+  if (validateResult.error) {
+    return res
+      .status(400)
+      .json({ Error: validateResult.error.details[0].message });
+      
+  }
+      //GENERATE SALT
+    const salt = await GenerateSalt();
+    const vendorPassword = await GeneratePassword(password, salt);
+
+  //CHECK IF THE ADMIN EXIST
+
+  const vendor = (await VendorInstance.findOne({
+    where: { email: email },
+  })) as unknown as VendorAtrributes;
+
+  const authorizer = (await UserInstance.findOne({
+    where: { id: id },
+  })) as unknown as UserAtrributes;
+
+  if(authorizer.role === "admin" || authorizer.role === "superadmin") {
+
+
+  if(!vendor) {
+
+    //ACCESS THE ADMIN OR SUPERADMIN
+    
+
+    const createVendor = await VendorInstance.create({
+        id: uuidvendor,
+        name,
+        ownerName,
+        pinCode,
+        phone,
+        address,
+        email,
+        password: vendorPassword,
+        salt,
+        role:"Vendor",
+        serviceAvailable: false,
+        rating: 0
+    })
+    return res.status(201).json({
+        Message:"Vendor created successfully",
+        createVendor
+    })
+  }
+  return res.status(400).json({
+    Error:"Vendor already exist"
+  })
+}
+return res.status(400).json({
+    Error:"Unauthorised"
+ })
+
+    } catch (err) {
+        console.log(err);
+        res
+          .status(500)
+          .json({ Error: "Internal Server Error", route: "/create-vendors" });
+      }
+}

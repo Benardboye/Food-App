@@ -6,6 +6,7 @@ import log from "./utils/logger";
 import userRouter from "./routes/userRoute";
 import indexRouter from "./routes/indexRoute";
 import adminRouter from "./routes/adminRoute";
+import VendorRouter from "./routes/vendorRoute"
 import { db } from "./config/indexDB";
 
 //Sequulize conncetion
@@ -42,6 +43,7 @@ app.use(cookieParser());
 //ROUTER
 app.use("/api/admins", adminRouter);
 app.use("/api/user", userRouter);
+app.use("/api/vendors", VendorRouter);
 app.use("/", indexRouter);
 
 const port = 3000;

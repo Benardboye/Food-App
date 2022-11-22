@@ -10,6 +10,7 @@ const logger_1 = __importDefault(require("./utils/logger"));
 const userRoute_1 = __importDefault(require("./routes/userRoute"));
 const indexRoute_1 = __importDefault(require("./routes/indexRoute"));
 const adminRoute_1 = __importDefault(require("./routes/adminRoute"));
+const vendorRoute_1 = __importDefault(require("./routes/vendorRoute"));
 const indexDB_1 = require("./config/indexDB");
 //Sequulize conncetion
 indexDB_1.db.sync().then(() => {
@@ -39,6 +40,7 @@ app.use((0, cookie_parser_1.default)());
 //ROUTER
 app.use("/api/admins", adminRoute_1.default);
 app.use("/api/user", userRoute_1.default);
+app.use("/api/vendors", vendorRoute_1.default);
 app.use("/", indexRoute_1.default);
 const port = 3000;
 // app.get('/', (req:Request, res:Response) => {

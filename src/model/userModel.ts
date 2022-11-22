@@ -16,7 +16,7 @@ export interface UserAtrributes {
   lat: number;
   verified: boolean;
   role:string
-  
+
 }
 
 export class UserInstance extends Model<UserAtrributes> {}
