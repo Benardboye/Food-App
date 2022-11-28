@@ -7,7 +7,7 @@ import {v4 as uuidv4} from "uuid"
 
 /**======================================================   Login   =================================================================**/
 
-import { GenerateSignature, loginSchema, option, validatePassword } from "../utils";
+import { GenerateSignature, loginSchema, option, updateVendorSchema, validatePassword } from "../utils";
 
 export const VendorLogin = async(req: Request, res: Response) => {
     try {
@@ -73,6 +73,7 @@ export const CreateFood = async(req:JwtPayload, res:Response) => {
             foodType,
             readyTime,
             price,
+            image
            } = req.body
 
            const id = req.vendor.id;
@@ -92,7 +93,8 @@ const vendor = (await VendorInstance.findOne({
     readyTime,
     price,
     rating: 0,
-    vendorId: id
+    vendorId: id,
+    image:req.file.path
     });
     return res.status(201).json({
         message:"Food added successfully",
@@ -166,3 +168,52 @@ export const DeleteFood = async(req:JwtPayload, res:Response) => {
       }
 
 }
+/**======================================================   UPDATE VENDOR PROFILE  =================================================================**/
+
+
+export const updateVendorProfile = async(req:JwtPayload, res: Response) => {
+  try{
+    const id = req.vendor.id;
+    const { name,
+      phone,
+      address,
+      coverImage } = req.body
+  
+    // //JOI VALIDATION
+    const validateResult = updateVendorSchema.validate(req.body, option) 
+    if (validateResult.error) {
+      return res
+        .status(400)
+        .json({ Error: validateResult.error.details[0].message });
+    }
+  
+    //CHECK IF THE USER IS A REGISTERED USER
+    const Vendor = await VendorInstance.findOne({where:{id:id}}) as unknown as VendorAtrributes
+    if(!Vendor) {
+      return res.status(400).json({
+        Error:"You are not authorised to update your profile"
+      })
+    }
+    const updatedVendor = await VendorInstance.update({
+      name,
+      phone,
+      address,
+      coverImage:req.file.path
+    }, {where:{id:id}}) as unknown as VendorAtrributes
+    if(updatedVendor) {
+      const Vendor = await VendorInstance.findOne({where:{id:id}}) as unknown as VendorAtrributes
+  return res.status(200).json({
+    message:"You have successfully updated your profile",
+    Vendor
+  })
+    }
+    return res.status(400).json({
+      message:"Error Occured"
+    })
+  } catch (err) {
+    return res.status(500).json({
+      Error: "Internal Server Error",
+      route: "/vendors/update-profile",
+    });
+  }
+  }

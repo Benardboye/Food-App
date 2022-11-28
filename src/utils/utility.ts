@@ -96,7 +96,17 @@ export const vendorSchema = Joi.object().keys({
   phone: Joi.string().required(),
   password: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")), //Joi.string().(/[a-zA-Z0-9]{6,30}/),
   name: Joi.string().required(),
-  ownerName: Joi.string().required(),
+  restaurantName: Joi.string().required(),
   address: Joi.string().required(),
   pinCode: Joi.string().required(),
+});
+
+
+/**======================================================    VENDOR PROFILE SCHEMA   =================================================================**/
+
+export const updateVendorSchema = Joi.object().keys({
+  name: Joi.string(),
+  phone: Joi.string(),
+  address: Joi.string(),
+  coverImgae: Joi.string(),
 });

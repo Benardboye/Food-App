@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.vendorSchema = exports.adminSchema = exports.updateSchema = exports.validatePassword = exports.loginSchema = exports.verifySignature = exports.GenerateSignature = exports.GeneratePassword = exports.GenerateSalt = exports.option = exports.registerSchema = void 0;
+exports.updateVendorSchema = exports.vendorSchema = exports.adminSchema = exports.updateSchema = exports.validatePassword = exports.loginSchema = exports.verifySignature = exports.GenerateSignature = exports.GeneratePassword = exports.GenerateSalt = exports.option = exports.registerSchema = void 0;
 const joi_1 = __importDefault(require("joi"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
@@ -98,7 +98,14 @@ exports.vendorSchema = joi_1.default.object().keys({
     phone: joi_1.default.string().required(),
     password: joi_1.default.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")),
     name: joi_1.default.string().required(),
-    ownerName: joi_1.default.string().required(),
+    restaurantName: joi_1.default.string().required(),
     address: joi_1.default.string().required(),
     pinCode: joi_1.default.string().required(),
+});
+/**======================================================    VENDOR PROFILE SCHEMA   =================================================================**/
+exports.updateVendorSchema = joi_1.default.object().keys({
+    name: joi_1.default.string(),
+    phone: joi_1.default.string(),
+    address: joi_1.default.string(),
+    coverImgae: joi_1.default.string(),
 });

@@ -12,6 +12,8 @@ const indexRoute_1 = __importDefault(require("./routes/indexRoute"));
 const adminRoute_1 = __importDefault(require("./routes/adminRoute"));
 const vendorRoute_1 = __importDefault(require("./routes/vendorRoute"));
 const indexDB_1 = require("./config/indexDB");
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
 //Sequulize conncetion
 indexDB_1.db.sync().then(() => {
     logger_1.default.info('Db connected succesfully');
@@ -42,7 +44,7 @@ app.use("/api/admins", adminRoute_1.default);
 app.use("/api/user", userRoute_1.default);
 app.use("/api/vendors", vendorRoute_1.default);
 app.use("/", indexRoute_1.default);
-const port = 3000;
+const port = 3001;
 // app.get('/', (req:Request, res:Response) => {
 //     res.status(200).json({message: 'Welcome to greatness'}
 //     )

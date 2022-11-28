@@ -8,6 +8,8 @@ import indexRouter from "./routes/indexRoute";
 import adminRouter from "./routes/adminRoute";
 import VendorRouter from "./routes/vendorRoute"
 import { db } from "./config/indexDB";
+import dotenv from "dotenv"
+dotenv.config()
 
 //Sequulize conncetion
 db.sync().then(() => {
@@ -46,7 +48,7 @@ app.use("/api/user", userRouter);
 app.use("/api/vendors", VendorRouter);
 app.use("/", indexRouter);
 
-const port = 3000;
+const port = 3001;
 
 // app.get('/', (req:Request, res:Response) => {
 //     res.status(200).json({message: 'Welcome to greatness'}

@@ -11,11 +11,11 @@ import {
 } from "../utils";
 import { UserAtrributes, UserInstance } from "../model/userModel";
 import { v4 as uuidv4 } from "uuid";
-import { Authorizer1 } from "../config/indexDB";
 import { VendorAtrributes, VendorInstance } from "../model/vendorModel";
 
-export const AdminRegister = async (req: Request, res: Response) => {
+export const AdminRegister = async (req: JwtPayload, res: Response) => {
   try {
+    const id = req.user.id
     //RECEIVE USERS DEATAILS AND CONFIRM IF THEY MATCH WITH THE WAY
     // IT SHOULD BE PROVIDED IN THE SCHEMA
 
@@ -37,18 +37,15 @@ export const AdminRegister = async (req: Request, res: Response) => {
 
     //CHECK IF THE ADMIN EXIST
 
-    const Admin = (await UserInstance.findOne({
-      where: { email: email },
-    })) as unknown as UserAtrributes;
-
-    if (!Admin) {
-      const superAdmin = (await UserInstance.findOne({
-        where: { email: Authorizer1 },
-      })) as unknown as UserAtrributes;
-
-      // ACCESS THE SUPERADMIN
-      if (superAdmin.role == "superadmin") {
-
+    const Admin = await UserInstance.findOne({ where: { email: email } }) as unknown as UserAtrributes
+    const authorizer = await UserInstance.findOne({where:{id:id}})  as unknown as UserAtrributes
+//CREATE USER
+if (!Admin) {
+    if(authorizer.role != "superadmin") {
+        return res.status(400).json({
+            Error: "Unauthorised"
+        })
+    }
         //CREATE USER
         let user = await UserInstance.create({
           id: uuidadmin, //This generate the unique Id
@@ -66,7 +63,7 @@ export const AdminRegister = async (req: Request, res: Response) => {
           verified: true,
           role: "admin",
         });
-      }
+      
       //CHECK IF THE ADMIN EXIST
       const Admin = (await UserInstance.findOne({
         where: { email: email },
@@ -176,7 +173,7 @@ export const CreateVendor = async(req:JwtPayload, res:Response) => {
     try{
         const {
             name,
-            ownerName, 
+            restaurantName, 
             pinCode,
             phone,
             address,
@@ -220,7 +217,7 @@ export const CreateVendor = async(req:JwtPayload, res:Response) => {
     const createVendor = await VendorInstance.create({
         id: uuidvendor,
         name,
-        ownerName,
+        restaurantName,
         pinCode,
         phone,
         address,
@@ -229,7 +226,8 @@ export const CreateVendor = async(req:JwtPayload, res:Response) => {
         salt,
         role:"Vendor",
         serviceAvailable: false,
-        rating: 0
+        rating: 0,
+        coverImage: ""
     })
     return res.status(201).json({
         Message:"Vendor created successfully",
