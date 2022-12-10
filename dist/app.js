@@ -12,6 +12,7 @@ const indexRoute_1 = __importDefault(require("./routes/indexRoute"));
 const adminRoute_1 = __importDefault(require("./routes/adminRoute"));
 const vendorRoute_1 = __importDefault(require("./routes/vendorRoute"));
 const indexDB_1 = require("./config/indexDB");
+const cors_1 = __importDefault(require("cors"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 //Sequulize conncetion
@@ -35,6 +36,7 @@ indexDB_1.db.sync().then(() => {
 // };
 // dbConnect()
 const app = (0, express_1.default)();
+app.use((0, cors_1.default)()); //THIS ENABLE CONNECTION BETWEEN FRONTEND TO BACKEND
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use((0, morgan_1.default)("dev"));

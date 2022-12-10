@@ -47,7 +47,6 @@ export const Register = async (req: Request, res: Response) => {
     const User = (await UserInstance.findOne({
       where: { email: email },
     })) as unknown as UserAtrributes;
-    console.log(User);
     //CREATE USER
     if (!User) {
       let user = await UserInstance.create({
@@ -68,7 +67,7 @@ export const Register = async (req: Request, res: Response) => {
       });
 
       //SEND OTP TO USER
-      await onRequestOtp(otp, phone);
+      // await onRequestOtp(otp, phone);
 
       //SEND EMAIL TO USER
       const html = emailHtml(otp);
@@ -87,13 +86,13 @@ export const Register = async (req: Request, res: Response) => {
       });
 
       return res.status(201).json({
-        message:
+        Message:
           "User Successfully Registered. Check your email or phonenumber for OTP verification",
         signature,
         verified: User.verified,
       });
     }
-    return res.status(400).json({ message: "User already exist" });
+    return res.status(400).json({ Error: "User already exist" });
   } catch (err) {
     console.log(err);
     res
@@ -139,7 +138,7 @@ export const VerifyUser = async (req: Request, res: Response) => {
           })) as unknown as UserAtrributes;
 
           return res.status(200).json({
-            message: "Verification Successful",
+            Message: "Verification Successful",
             signature,
             verified: User.verified,
           });
@@ -193,7 +192,7 @@ export const Login = async (req: Request, res: Response) => {
           verified: User.verified,
         });
         return res.status(200).json({
-          message: "You have successfully logged in",
+          Message: "You have successfully logged in",
           signature,
           email: User.email,
           verified: User.verified,
@@ -243,14 +242,14 @@ export const ResendOtp = async (req: Request, res: Response) => {
           where: { email: decode.email },
         })) as unknown as UserAtrributes;
 
-        await onRequestOtp(otp, User.phone);
+        // await onRequestOtp(otp, User.phone);
 
         //SEND EMAIL TO USER
         const html = emailHtml(otp);
         await mailsent(FromAdminMail, User.email, userSubject, html);
 
         return res.status(200).json({
-          message: "OTP resent successfully",
+          Message: "OTP resent successfully",
         });
       }
       return res.status(400).json({
@@ -276,7 +275,7 @@ export const getAllUser = async (req: Request, res: Response) => {
       limit: limit,
     }); //FINDALL({}) METHOD CAN BE USED TOO BUT IT DOESN'T HAVE THE COUNT AND ROW FEATURE
     return res.status(200).json({
-      message: "You have successfully retrived all users",
+      Message: "You have successfully retrived all users",
       count: users.count,
       users: users.rows,
     });
@@ -309,7 +308,7 @@ export const getSingleUser = async (
       });
     }
       return res.status(400).json({
-        message: "User not found",
+        Error: "User not found",
       });
     
   } catch (err) {
@@ -351,12 +350,12 @@ try{
   if(updatedUser) {
     const User = await UserInstance.findOne({where:{id:id}}) as unknown as UserAtrributes
 return res.status(200).json({
-  message:"You have successfully updated your profile",
+  Message:"You have successfully updated your profile",
   User
 })
   }
   return res.status(400).json({
-    message:"Error Occured"
+    Error:"Error Occured"
   })
 } catch (err) {
   return res.status(500).json({

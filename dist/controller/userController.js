@@ -35,7 +35,6 @@ const Register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const User = (yield userModel_1.UserInstance.findOne({
             where: { email: email },
         }));
-        console.log(User);
         //CREATE USER
         if (!User) {
             let user = yield userModel_1.UserInstance.create({
@@ -55,7 +54,7 @@ const Register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 role: "user"
             });
             //SEND OTP TO USER
-            yield (0, utils_1.onRequestOtp)(otp, phone);
+            // await onRequestOtp(otp, phone);
             //SEND EMAIL TO USER
             const html = (0, utils_1.emailHtml)(otp);
             yield (0, utils_1.mailsent)(indexDB_1.FromAdminMail, email, indexDB_1.userSubject, html);
@@ -70,12 +69,12 @@ const Register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 verified: User.verified,
             });
             return res.status(201).json({
-                message: "User Successfully Registered. Check your email or phonenumber for OTP verification",
+                Message: "User Successfully Registered. Check your email or phonenumber for OTP verification",
                 signature,
                 verified: User.verified,
             });
         }
-        return res.status(400).json({ message: "User already exist" });
+        return res.status(400).json({ Error: "User already exist" });
     }
     catch (err) {
         console.log(err);
@@ -113,7 +112,7 @@ const VerifyUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                         where: { email: decode.email },
                     }));
                     return res.status(200).json({
-                        message: "Verification Successful",
+                        Message: "Verification Successful",
                         signature,
                         verified: User.verified,
                     });
@@ -159,7 +158,7 @@ const Login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                     verified: User.verified,
                 });
                 return res.status(200).json({
-                    message: "You have successfully logged in",
+                    Message: "You have successfully logged in",
                     signature,
                     email: User.email,
                     verified: User.verified,
@@ -202,12 +201,12 @@ const ResendOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 const User = (yield userModel_1.UserInstance.findOne({
                     where: { email: decode.email },
                 }));
-                yield (0, utils_1.onRequestOtp)(otp, User.phone);
+                // await onRequestOtp(otp, User.phone);
                 //SEND EMAIL TO USER
                 const html = (0, utils_1.emailHtml)(otp);
                 yield (0, utils_1.mailsent)(indexDB_1.FromAdminMail, User.email, indexDB_1.userSubject, html);
                 return res.status(200).json({
-                    message: "OTP resent successfully",
+                    Message: "OTP resent successfully",
                 });
             }
             return res.status(400).json({
@@ -233,7 +232,7 @@ const getAllUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             limit: limit,
         }); //FINDALL({}) METHOD CAN BE USED TOO BUT IT DOESN'T HAVE THE COUNT AND ROW FEATURE
         return res.status(200).json({
-            message: "You have successfully retrived all users",
+            Message: "You have successfully retrived all users",
             count: users.count,
             users: users.rows,
         });
@@ -261,7 +260,7 @@ const getSingleUser = (req, res, next) => __awaiter(void 0, void 0, void 0, func
             });
         }
         return res.status(400).json({
-            message: "User not found",
+            Error: "User not found",
         });
     }
     catch (err) {
@@ -300,12 +299,12 @@ const updateUserProfile = (req, res) => __awaiter(void 0, void 0, void 0, functi
         if (updatedUser) {
             const User = yield userModel_1.UserInstance.findOne({ where: { id: id } });
             return res.status(200).json({
-                message: "You have successfully updated your profile",
+                Message: "You have successfully updated your profile",
                 User
             });
         }
         return res.status(400).json({
-            message: "Error Occured"
+            Error: "Error Occured"
         });
     }
     catch (err) {

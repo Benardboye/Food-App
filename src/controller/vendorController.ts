@@ -43,7 +43,7 @@ export const VendorLogin = async(req: Request, res: Response) => {
               serviceAvailable: Vendor.serviceAvailable,
             });
             return res.status(200).json({
-              message: "You have successfully logged in",
+              Message: "You have successfully logged in",
               signature,
               email: Vendor.email,
               serviceAvailable: Vendor.serviceAvailable,
@@ -97,7 +97,7 @@ const vendor = (await VendorInstance.findOne({
     image:req.file.path
     });
     return res.status(201).json({
-        message:"Food added successfully",
+        Message:"Food added successfully",
         createFood
     })
   }
@@ -117,7 +117,8 @@ export const VendorProfile = async(req:JwtPayload, res:Response) => {
     
         const vendor = (await VendorInstance.findOne({
             where: { id: id },
-            // attributes: [ "id", "name", "description", "category", "foodType", etc] FOR VENDOR
+            
+            //  attributes: [ "id", "name", "description", "category", "foodType"], //FOR VENDOR
             include: [   //THIS SHOWS THE RESULT OF LINKED MODELS, IT SHOWS THE DETAILS OF SERVICES PROVIDED BY A PARTICULAR VENDOR
                 {
                     model: FoodInstance, 
@@ -127,14 +128,15 @@ export const VendorProfile = async(req:JwtPayload, res:Response) => {
                 }  
             ]
           })) 
+          attributes: [ "id", "name", "description", "category", "foodType"]
           return res.status(200).json({
-            vendor
+            vendor,
           })
     } catch (err) {
         console.log(err);
        return res
           .status(500)
-          .json({ Error: "Internal Server Error", route: "/user/get-profile" });
+          .json({ Error: "Internal Server Error", route: "/vendors/get-profile" });
       }
 }
 
@@ -154,7 +156,7 @@ export const DeleteFood = async(req:JwtPayload, res:Response) => {
           if(vendor) {
               const deletedFood = await FoodInstance.destroy({where: { id: foodid }}) 
               return res.status(200).json({
-                message: "You have succesfsuly deleted food",
+                Message: "You have succesfsuly deleted food",
                 deletedFood
               })
           }
@@ -177,6 +179,7 @@ export const updateVendorProfile = async(req:JwtPayload, res: Response) => {
     const { name,
       phone,
       address,
+      restaurantName,
       coverImage } = req.body
   
     // //JOI VALIDATION
@@ -197,18 +200,19 @@ export const updateVendorProfile = async(req:JwtPayload, res: Response) => {
     const updatedVendor = await VendorInstance.update({
       name,
       phone,
+      restaurantName,
       address,
       coverImage:req.file.path
     }, {where:{id:id}}) as unknown as VendorAtrributes
     if(updatedVendor) {
       const Vendor = await VendorInstance.findOne({where:{id:id}}) as unknown as VendorAtrributes
   return res.status(200).json({
-    message:"You have successfully updated your profile",
+    Message:"You have successfully updated your profile",
     Vendor
   })
     }
     return res.status(400).json({
-      message:"Error Occured"
+      Error:"Error Occured"
     })
   } catch (err) {
     return res.status(500).json({
@@ -217,3 +221,67 @@ export const updateVendorProfile = async(req:JwtPayload, res: Response) => {
     });
   }
   }
+
+  /**======================================================  ALL VENDOR PROFILE  =================================================================**/
+//  NOTE: I CAN ADD LIMIT TO AQNY GET REQUEST FOR THE  PURPOSE OF PAGINATION
+export const AllVendorProfile = async(req:Request, res:Response) => {
+  try{ 
+      
+      const vendor = (await VendorInstance.findAll({
+          
+          
+          //  attributes: [ "id", "name", "description", "category", "foodType"], //FOR VENDOR
+          include: [   //THIS SHOWS THE RESULT OF LINKED MODELS, IT SHOWS THE DETAILS OF SERVICES PROVIDED BY A PARTICULAR VENDOR
+              {
+                  model: FoodInstance, 
+                  as: "food",
+                  //TO AVOID RENDERING OF SOME DETAILS THTA SHOULD NOT BE DISPLAYN TO USER, THE ATTRIBUTE PROPERTY CAN TAKE WHAT IS REQUIRED TO BE DISPLAYED
+                  attributes: [ "id", "name", "description", "category", "foodType", "readyTime", "price", "rating", "vendorId"]  //FOR FOOD
+              }  
+          ]
+        }))
+        return res.status(200).json({
+          vendor
+        })
+  } catch (err) {
+      console.log(err);
+     return res
+        .status(500)
+        .json({ Error: "Internal Server Error", route: "/vendors/get-all-profile" });
+    }
+}
+
+
+/**======================================================   DISPLAY VENDOR AND FOOD  =================================================================**/
+
+//DESTORY IS DONE USING THE UNIQUE ID OF THE FOOD 
+ 
+export const DisplayVendorAndFood = async(req:Request, res:Response) => {
+  try{
+      const id = req.params.id;
+
+      const vendor = (await VendorInstance.findOne({
+        where: { id: id },
+        
+        //  attributes: [ "id", "name", "description", "category", "foodType"], //FOR VENDOR
+        include: [   //THIS SHOWS THE RESULT OF LINKED MODELS, IT SHOWS THE DETAILS OF SERVICES PROVIDED BY A PARTICULAR VENDOR
+            {
+                model: FoodInstance, 
+                as: "food",
+                //TO AVOID RENDERING OF SOME DETAILS THTA SHOULD NOT BE DISPLAYN TO USER, THE ATTRIBUTE PROPERTY CAN TAKE WHAT IS REQUIRED TO BE DISPLAYED
+                attributes: [ "id", "name", "description", "category", "foodType", "readyTime", "image", "price", "rating", "vendorId"]  //FOR FOOD
+            }  
+        ]
+      })) 
+      attributes: [ "id", "name", "description", "category", "foodType"]
+      return res.status(200).json({
+        vendor,
+      })
+} catch (err) {
+    console.log(err);
+   return res
+      .status(500)
+      .json({ Error: "Internal Server Error", route: "/vendors/get-vendor-and-food/:id" });
+  }
+
+}

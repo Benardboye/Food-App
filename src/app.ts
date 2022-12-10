@@ -8,6 +8,7 @@ import indexRouter from "./routes/indexRoute";
 import adminRouter from "./routes/adminRoute";
 import VendorRouter from "./routes/vendorRoute"
 import { db } from "./config/indexDB";
+import cors from "cors"
 import dotenv from "dotenv"
 dotenv.config()
 
@@ -37,10 +38,12 @@ db.sync().then(() => {
 
 const app = express();
 
+app.use(cors())    //THIS ENABLE CONNECTION BETWEEN FRONTEND TO BACKEND
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(logger("dev"));
 app.use(cookieParser());
+
 
 //ROUTER
 app.use("/api/admins", adminRouter);

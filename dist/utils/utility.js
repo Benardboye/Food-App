@@ -102,10 +102,11 @@ exports.vendorSchema = joi_1.default.object().keys({
     address: joi_1.default.string().required(),
     pinCode: joi_1.default.string().required(),
 });
-/**======================================================    VENDOR PROFILE SCHEMA   =================================================================**/
+/**======================================================    VENDOR PROFILE UPDATE SCHEMA   =================================================================**/
 exports.updateVendorSchema = joi_1.default.object().keys({
     name: joi_1.default.string(),
     phone: joi_1.default.string(),
     address: joi_1.default.string(),
     coverImgae: joi_1.default.string(),
+    restaurantName: joi_1.default.string()
 });

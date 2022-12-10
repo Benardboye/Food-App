@@ -77,7 +77,7 @@ if (!Admin) {
       });
 
       return res.status(201).json({
-        message: "Admin Successfully Registered.",
+        Message: "Admin Successfully Registered.",
         signature,
         verified: Admin.verified,
       });
@@ -152,12 +152,12 @@ export const SuperAdminRegister = async (req: JwtPayload, res: Response) => {
       });
 
       return res.status(201).json({
-        message: "Admin Successfully Registered.",
+        Message: "Admin Successfully Registered.",
         signature,
         verified: Admin.verified,
       });
     }
-    return res.status(400).json({ message: "Admin already exist" });
+    return res.status(400).json({ message: "Email already exist" });
   } catch (err) {
     console.log(err);
     res

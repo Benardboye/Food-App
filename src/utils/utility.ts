@@ -102,11 +102,12 @@ export const vendorSchema = Joi.object().keys({
 });
 
 
-/**======================================================    VENDOR PROFILE SCHEMA   =================================================================**/
+/**======================================================    VENDOR PROFILE UPDATE SCHEMA   =================================================================**/
 
 export const updateVendorSchema = Joi.object().keys({
   name: Joi.string(),
   phone: Joi.string(),
   address: Joi.string(),
   coverImgae: Joi.string(),
+  restaurantName: Joi.string()
 });
